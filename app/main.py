@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.models.database import engine, Base
+from app.data_sources.database import engine, Base
 from app.routers.room_router import room_router
 from app.routers.user_router import user_router
 

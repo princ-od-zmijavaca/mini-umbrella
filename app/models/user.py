@@ -1,4 +1,4 @@
-from .database import Base, SessionLocal
+from app.data_sources.database import Base, SessionLocal
 from sqlalchemy import Integer, Column, String, exc
 
 from ..schemas.user import UserSchema
@@ -8,11 +8,10 @@ class User(Base):
 
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(30), nullable=False)
 
-    def __init__(self, id: int, name: str):
-        self.id = id
+    def __init__(self, name: str):
         self.name = name
 
     def __repr__(self):

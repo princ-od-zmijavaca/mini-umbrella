@@ -1,6 +1,5 @@
 version: "3.8"
 
-
 services:
   web:
     container_name: mini_umbrella_api
@@ -11,8 +10,16 @@ services:
       - .:/app
     depends_on:
       - postgres
-      - pg_admin
+      - redis
 
+  redis:
+    container_name: cache
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - cache:/data
 
   postgres:
     container_name: postgres_db
@@ -21,6 +28,8 @@ services:
       - postgres:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
+    expose:
+      - 5432
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -29,22 +38,12 @@ services:
     restart: always
 
 
-  pg_admin:
-    container_name: pgadmin_gui
-    image: dpage/pgadmin4
-    ports:
-      - "5050:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL : admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD : admin
-      PGADMIN_LISTEN_PORT : 80
-    volumes:
-      - pgadmin:/var/lib/pgadmin
-    restart: always
-    logging:
-      driver: none
-
-
 volumes:
+  cache:
+    driver: local
   postgres:
-  pgadmin:
+
+
+networks:
+  app-tier:
+    driver: bridge
