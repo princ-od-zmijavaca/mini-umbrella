@@ -6,12 +6,21 @@ import redis
 
 
 class RedisPool:
-    def __init__(self, host: str, port: int):
+    def __init__(self, host: str, port: str, username: str or None, password: str or None, ssl: bool = None,
+                 ssl_cert_reqs: bool = None):
         self.pool = redis.ConnectionPool(host=host, port=port)
+        self.username = username
+        self.password = password
+        self.ssl = ssl
+        self.ssl_cert_reqs = ssl_cert_reqs
         self.connection = None
 
     def get_connection(self):
-        self.connection = self.connection or redis.Redis(connection_pool=self.pool)
+        self.connection = self.connection or redis.Redis(connection_pool=self.pool,
+                                                         username=self.username,
+                                                         password=self.password,
+                                                         ssl=self.ssl,
+                                                         ssl_cert_reqs=self.ssl_cert_reqs)
         return self.connection
 
 
@@ -33,15 +42,17 @@ class RedisClient:
         self._redis_pool.delete(key)
 
 
-test = redis.ConnectionPool()
+if environ.get("REDIS_URL"):
+    url = urlparse(environ.get("REDIS_URL"))
+    redis_host = url.hostname
+    redis_port = url.port
+    redis_username = url.username
+    redis_password = url.password
 
-url = urlparse(environ.get("REDIS_URL"))
-redis_client = redis.Redis(host=url.hostname, port=url.port, username=url.username, password=url.password, ssl=True, ssl_cert_reqs=None)
+    redis_client = RedisClient(
+        redis_pool=RedisPool(host=redis_host, port=redis_port, username=redis_username, password=redis_password))
+else:
+    redis_host = "cache"
+    redis_port = "6379"
+    redis_client = RedisClient(redis_pool=RedisPool(host=redis_host, port=redis_port, username=None, password=None))
 
-
-# redis_host = environ.get("REDISTOGO_URL") or "cache"
-# redis_port = environ.get("REDIS_PORT") or 6379
-# redis_db = environ.get("REDIS_DB") or 0
-# redis_client = RedisClient(redis_pool=RedisPool(host=redis_url.hostname,port=redis_url.port))
-# redis_client = RedisClient(redis_pool=RedisPool(host=redis_url.hostname,port=redis_url.port))
-# redis_client = RedisClient(redis_pool=RedisPool(host=redis_host, port=redis_port, db=redis_db))
