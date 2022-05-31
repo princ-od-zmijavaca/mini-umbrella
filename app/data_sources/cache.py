@@ -1,12 +1,13 @@
 import json
 from os import environ
+from urllib.parse import urlparse
 
 import redis
 
 
 class RedisPool:
-    def __init__(self, host: str, port: int, db: int):
-        self.pool = redis.ConnectionPool(host=host, port=port, db=db)
+    def __init__(self, host: str, port: int):
+        self.pool = redis.ConnectionPool(host=host, port=port)
         self.connection = None
 
     def get_connection(self):
@@ -32,8 +33,15 @@ class RedisClient:
         self._redis_pool.delete(key)
 
 
-redis_host = environ.get("REDISTOGO_URL") or "cache"
-redis_port = environ.get("REDIS_PORT") or 6379
-redis_db = environ.get("REDIS_DB") or 0
+test = redis.ConnectionPool()
 
-redis_client = RedisClient(redis_pool=RedisPool(host=redis_host, port=redis_port, db=redis_db))
+url = urlparse(environ.get("REDIS_URL"))
+redis_client = redis.Redis(host=url.hostname, port=url.port, username=url.username, password=url.password, ssl=True, ssl_cert_reqs=None)
+
+
+# redis_host = environ.get("REDISTOGO_URL") or "cache"
+# redis_port = environ.get("REDIS_PORT") or 6379
+# redis_db = environ.get("REDIS_DB") or 0
+# redis_client = RedisClient(redis_pool=RedisPool(host=redis_url.hostname,port=redis_url.port))
+# redis_client = RedisClient(redis_pool=RedisPool(host=redis_url.hostname,port=redis_url.port))
+# redis_client = RedisClient(redis_pool=RedisPool(host=redis_host, port=redis_port, db=redis_db))
