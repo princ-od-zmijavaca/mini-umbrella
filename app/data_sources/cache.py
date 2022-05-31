@@ -31,8 +31,9 @@ class RedisClient:
     def delete(self, key: str):
         self._redis_pool.delete(key)
 
+
 redis_host = environ.get("REDISTOGO_URL") or "cache"
 redis_port = environ.get("REDIS_PORT") or 6379
 redis_db = environ.get("REDIS_DB") or 0
 
-redis_client = RedisClient(redis_pool=RedisPool(host="cache", port=6379, db=0))
+redis_client = RedisClient(redis_pool=RedisPool(host=redis_host, port=redis_port, db=redis_db))
