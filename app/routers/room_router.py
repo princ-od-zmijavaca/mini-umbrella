@@ -6,8 +6,12 @@ from app.models.room import delete_room_by_id
 from app.schemas.room import RoomSchema
 from app.schemas.vote import VoteSchema
 
-
 room_router = APIRouter()
+
+
+@room_router.get("/")
+async def default():
+    return {"Hello": "World"}
 
 
 @room_router.get("/test")
