@@ -11,9 +11,14 @@ DB_HOST_ADDRESS = "postgres"
 DB_PORT = "5432"
 DB_NAME = "miniumbrelladb"
 
+
 local_connection_string = f"{DB_DRIVER}://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST_ADDRESS}:{DB_PORT}/{DB_NAME}"
 connection_string = environ.get("DATABASE_URL") if environ.get("DATABASE_URL") else local_connection_string
 
-engine = create_engine(connection_string, echo=False)
+uri = environ.get("DATABASE_URL")
+if uri and uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+
+engine = create_engine(uri, echo=False)
 Base = declarative_base()
 SessionLocal = sessionmaker(bind=engine)
