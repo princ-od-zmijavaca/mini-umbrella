@@ -50,7 +50,7 @@ if environ.get("REDIS_URL"):
     redis_password = url.password
 
     redis_client = RedisClient(
-        redis_pool=RedisPool(host=redis_host, port=redis_port, username=redis_username, password=redis_password))
+        redis_pool=RedisPool(host=redis_host, port=redis_port, username=redis_username, password=redis_password,ssl=True, ssl_cert_reqs=None))
 else:
     redis_host = "cache"
     redis_port = "6379"
